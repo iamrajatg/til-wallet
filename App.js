@@ -1,20 +1,28 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import "react-native-gesture-handler";
+import { NavigationContainer } from "@react-navigation/native";
+import AuthNavigator from "./src/navigations/AuthNavigator";
+import { Provider } from "react-redux";
+import createSagaMiddleware from "redux-saga";
+import { configureStore } from "@reduxjs/toolkit";
+import walletReducer from "./src/slices/walletSlice";
+import commonReducer from "./src/slices/commonSlice";
+import walletSaga from "./src/sagas/walletSaga.js";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+const saga = createSagaMiddleware();
+const store = configureStore({
+  reducer: { wallet: walletReducer, common: commonReducer },
+  middleware: [saga]
 });
+saga.run(walletSaga);
+
+const App = () => {
+  return (
+    <Provider store={store}>
+      <NavigationContainer>
+        <AuthNavigator />
+      </NavigationContainer>
+    </Provider>
+  );
+};
+
+export default App;

@@ -24,10 +24,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "til.wallet"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "jsEngine": "hermes",
+    "extra": {
+      "eas": {
+        "projectId": "b793b6a8-f182-4a4e-899d-96803ed6b6a6"
+      }
     }
   }
 }
