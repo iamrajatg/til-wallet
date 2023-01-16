@@ -61,7 +61,7 @@ export const walletSlice = createSlice({
       state.isError = false;
     },
     removeCredentialSuccess: (state, action) => {
-      if (action.payload) state.credentials.splice(action.payload);
+      if (action.payload>=0) state.credentials.splice(action.payload);
       state.isLoading = false;
       state.isError = false;
       state.snackMsg = "Credential Removed Successfully!";
@@ -69,6 +69,7 @@ export const walletSlice = createSlice({
     removeCredentialFail: (state, action) => {
       state.isError = true;
       state.isLoading = false;
+      state.snackMsg = "Error Removing Credential.";
     },
     setSnackMsg: (state, action) => {
       state.snackMsg = action.payload;

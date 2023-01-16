@@ -8,12 +8,18 @@ import {
 import React, { useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { useDispatch, useSelector } from "react-redux";
-import { loadCredentials, setSnackMsg } from "../../slices/walletSlice";
+import {
+  loadCredentials,
+  removeCredential,
+  setSnackMsg,
+} from "../../slices/walletSlice";
 import { setError, setLoader } from "../../slices/commonSlice";
 import Loader from "../../components/Loader";
 import QRModal from "../../components/QRModal";
 import { Menu, Provider, Snackbar } from "react-native-paper";
 import VCCard from "../../components/VCCard";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CONSTANTS } from "./constants";
 
 const CredentialsHome = () => {
   const dispatch = useDispatch();
@@ -22,18 +28,29 @@ const CredentialsHome = () => {
   const [QRCredential, setQRCredential] = useState("");
   const isLoading = useSelector((state) => state.common.isLoading);
   const [showMenu, setShowMenu] = useState(false);
-  const [currentMenuPosition, setCurrentMenuPosition] = useState(null);
+  const [currentCardData, setCurrentCardData] = useState({});
+  const { LOCAL_STORE_KEYS } = CONSTANTS;
+  const { x, y, index, key, vcJson } = currentCardData;
 
   useEffect(() => {
-    async function getValueFor(key) {
-      let result = await SecureStore.getItemAsync(key);
-      if (result) {
-        return result;
+    async function getCredentials() {
+      let keys = await AsyncStorage.getAllKeys();
+      let credentials = null;
+      if (Array.isArray(keys)) {
+        keys = keys?.filter((key) =>
+          key.includes(LOCAL_STORE_KEYS.CREDENTIAL_PREFIX)
+        );
+        if (keys?.length) {
+          credentials = await AsyncStorage.multiGet(keys);
+          if (credentials) {
+            credentials = credentials.map(([key, value]) => JSON.parse(value));
+          }
+        }
       }
-      return null;
+      return credentials;
     }
     dispatch(setLoader(true));
-    getValueFor("credentials")
+    getCredentials()
       .then((res) => {
         if (!res) {
           dispatch(setLoader(false));
@@ -41,7 +58,7 @@ const CredentialsHome = () => {
           return;
         }
 
-        dispatch(loadCredentials(JSON.parse(res)));
+        dispatch(loadCredentials(res));
         dispatch(setLoader(false));
         dispatch(setError(false));
       })
@@ -69,21 +86,34 @@ const CredentialsHome = () => {
               onDismiss={() => {
                 setShowMenu(false);
               }}
-              anchor={currentMenuPosition}
+              anchor={x && y ? { x, y } : null}
             >
-              <Menu.Item onPress={() => {}} title="Item 1" />
-              <Menu.Item onPress={() => {}} title="Item 2" />
-              <Menu.Item onPress={() => {}} title="Item 3" />
+              <Menu.Item
+                onPress={() => {
+                  setQRCredential(vcJson);
+                  setShowMenu(false);
+                }}
+                title="Share"
+              />
+              <Menu.Item
+                onPress={() => {
+                  dispatch(removeCredential({ index, key }));
+                  setShowMenu(false);
+                }}
+                title="Remove"
+              />
             </Menu>
             {credentials?.length ? (
               credentials.map((vc, i) => (
                 <VCCard
                   key={vc.key}
+                  vcId={vc.key}
+                  index={i}
                   type={vc.type}
                   issuer={vc.issuer}
-                  onShare={() => setQRCredential(vc.vcJson)}
-                  setCurrentMenuPosition={setCurrentMenuPosition}
+                  setCurrentCardData={setCurrentCardData}
                   setShowMenu={setShowMenu}
+                  vcJson={vc.vcJson}
                 />
               ))
             ) : (
@@ -98,7 +128,7 @@ const CredentialsHome = () => {
         <Snackbar
           visible={snackMsg}
           onDismiss={() => dispatch(setSnackMsg(""))}
-          duration={3000}
+          duration={1500}
         >
           {snackMsg}
         </Snackbar>

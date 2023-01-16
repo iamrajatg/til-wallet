@@ -5,10 +5,11 @@ import Dialog from "../../components/Dialog";
 import { COLORS, ROUTES } from "../../constants";
 import { useDispatch } from "react-redux";
 import { addCredential } from "../../slices/walletSlice";
+import { useIsFocused } from "@react-navigation/native";
 
-export default function QRScanner({navigation}) {
-  
-  const dispatch = useDispatch()
+export default function QRScanner({ navigation }) {
+  const dispatch = useDispatch();
+  const isFocused = useIsFocused();
 
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
@@ -17,13 +18,12 @@ export default function QRScanner({navigation}) {
   const [successBtnTitle, setSuccessBtnTitle] = useState("");
   const [cancelBtnTitle, setCancelBtnTitle] = useState("");
   const [dialogTitle, setDialogTitle] = useState("");
-  const [scannedData,setScannedData] = useState(null)
+  const [scannedData, setScannedData] = useState(null);
 
   const handleAgree = () => {
     setShowDialog(false);
-    if(scannedData)
-    dispatch(addCredential(scannedData))
-    navigation.navigate(ROUTES.CREDENTIALS)
+    if (scannedData) dispatch(addCredential(scannedData));
+    navigation.navigate(ROUTES.CREDENTIALS);
   };
 
   const handleDisagree = () => {
@@ -39,7 +39,8 @@ export default function QRScanner({navigation}) {
     getBarCodeScannerPermissions();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = ({ data }) => {
+    if (scanned) return;
     setScanned(true);
     try {
       const parsedData = JSON.parse(data);
@@ -49,22 +50,22 @@ export default function QRScanner({navigation}) {
             parsedData.type.includes("VerifiableCredential")) ||
           parsedData.type === "VerifiableCredential"
         ) {
-          setScannedData(parsedData)
-          setShowDialog(true)
+          setScannedData(parsedData);
+          setShowDialog(true);
           setDialogTitle("Import VC");
           setDialogText("Do you want to import this VC?");
           setSuccessBtnTitle("YES");
           setCancelBtnTitle("NO");
-        } else {    
+        } else {
           throw new Error("Invalid QR");
         }
       }
     } catch (error) {
-        setShowDialog(true)
-        setDialogTitle("Invalid QR!");
-        setDialogText("QR code not supported");
-        setSuccessBtnTitle("");
-        setCancelBtnTitle("OK");
+      setShowDialog(true);
+      setDialogTitle("Invalid QR!");
+      setDialogText("QR code not supported");
+      setSuccessBtnTitle("");
+      setCancelBtnTitle("OK");
     }
   };
 
@@ -77,12 +78,12 @@ export default function QRScanner({navigation}) {
 
   return (
     <View style={styles.container}>
-      <BarCodeScanner
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={
-          StyleSheet.absoluteFillObject
-    }
-      />
+      {isFocused && (
+        <BarCodeScanner
+          onBarCodeScanned={handleBarCodeScanned}
+          style={StyleSheet.absoluteFillObject}
+        />
+      )}
       {scanned && (
         <Pressable
           style={({ pressed }) => [
@@ -110,23 +111,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 15,
-    alignItems:"center",
+    alignItems: "center",
     flexDirection: "column",
     justifyContent: "center",
   },
   scanNewBtn: {
-    position:'absolute',
-    zIndex:10,
-    alignItems:'center',
-    bottom:'10%',
+    position: "absolute",
+    zIndex: 10,
+    alignItems: "center",
+    bottom: "10%",
     padding: 10,
     backgroundColor: COLORS.primary,
     borderRadius: 20,
-    width:'100%',
+    width: "100%",
   },
-  scanNewBtnTxt:{
+  scanNewBtnTxt: {
     fontWeight: "bold",
     fontSize: 17,
     color: COLORS.white,
-  }
+  },
 });

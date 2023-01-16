@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-nav-app",
-    "slug": "expo-nav-app",
+    "name": "til-wallet",
+    "slug": "til-wallet",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

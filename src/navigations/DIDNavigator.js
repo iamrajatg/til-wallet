@@ -18,11 +18,7 @@ const DIDNavigator = ({ navigation }) => {
         name={ROUTES.DID_LIST}
         component={DIDHome}
         options={()=>({
-          headerTitleAlign:'center',
           headerTitle:"DIDs",
-          headerTitleStyle:{
-            fontWeight:'bold'
-          },
           headerRight: (props) => (
             <Pressable
               {...props}
@@ -36,18 +32,6 @@ const DIDNavigator = ({ navigation }) => {
                   size={24}
                   color={COLORS.primary}
                 />
-              </View>
-            </Pressable>
-          ),
-          headerLeft: (props) => (
-            <Pressable
-              {...props}
-              onPress={() => {
-                navigation.openDrawer();
-              }}
-            >
-              <View style={styles.leftDrawerBtn}>
-                <Icon name="menu" size={30} color={COLORS.primary} />
               </View>
             </Pressable>
           ),

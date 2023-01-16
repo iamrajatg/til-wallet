@@ -1,18 +1,19 @@
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { COLORS } from "../constants";
-import { Divider, Menu, Provider } from "react-native-paper";
 
 const VCCard = ({
   type = "Verifiable Credential",
   expiryDate = "01/22",
   issuanceDate = "01/23",
   issuer = "TIL",
-  onShare,
   url = "https://www.twitter.com",
-  setCurrentMenuPosition,
+  setCurrentCardData,
   setShowMenu,
+  index,
+  vcId,
+  vcJson
 }) => {
   const menuBtnRef = useRef();
   return (
@@ -28,25 +29,12 @@ const VCCard = ({
       <Text style={styles.issuer}>{issuer}</Text>
       <Text style={styles.issuanceDate}>{issuanceDate}</Text>
       <Text style={styles.expiryDate}>{expiryDate}</Text>
-      <View style={styles.buttons}>
-        <Pressable
-          onPress={onShare}
-          style={({ pressed }) => [
-            styles.btn,
-            styles.shareBtn,
-            pressed ? { opacity: 0.5 } : {},
-          ]}
-        >
-          <Text style={{ color: "white" }}>Share</Text>
-        </Pressable>
-      </View>
       <Pressable
         ref={menuBtnRef}
         onPress={(e) => {
-          // e.stopPropagation()
           if (menuBtnRef.current) {
             menuBtnRef.current.measure((fx, fy, width, height, px, py) => {
-              setCurrentMenuPosition({ x: px, y: py - 80 });
+              setCurrentCardData({ x: px, y: py - 70,index,key:vcId,vcJson});
             });
           }
           setShowMenu(true);
@@ -58,7 +46,7 @@ const VCCard = ({
       >
         <MaterialCommunityIcons
           name="dots-vertical-circle"
-          size={24}
+          size={35}
           color={COLORS.primary}
         />
       </Pressable>
@@ -84,25 +72,9 @@ const styles = StyleSheet.create({
   },
   menuicon: {
     position: "absolute",
-    top: 0,
+    top: 10,
     right: 10,
     color: COLORS.primary,
   },
-  btn: {
-    padding: 10,
-    width: "25%",
-    borderRadius: 15,
-    color: COLORS.white,
-    alignItems: "center",
-    backgroundColor: COLORS.primary,
-  },
-  shareBtn: {},
-  copyBtn: {
-    marginRight: 20,
-  },
-  buttons: {
-    flexDirection: "row",
-    // flex: 1,
-    marginTop: 10,
-  },
+
 });

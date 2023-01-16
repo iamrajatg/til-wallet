@@ -1,11 +1,9 @@
-import React, { createContext, useRef, useState } from "react";
-import { Home } from "../screens";
+import React, { createContext, useRef } from "react";
 import { COLORS, ROUTES } from "../constants";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import SettingsNavigator from "./SettingsNavigator";
-import { Pressable, View, StyleSheet } from "react-native";
-import { Ionicons as Icon } from "@expo/vector-icons";
+import { StyleSheet } from "react-native";
 import DIDNavigator from "./DIDNavigator";
 import QRScanner from "../screens/home/Scanner";
 import CredentialsHome from "../screens/home/CredentialsHome";
@@ -21,18 +19,6 @@ export default function BottomTabNavigator(props) {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerTitleAlign: "left",
-          headerLeft: (props) => (
-            <Pressable
-              {...props}
-              onPress={() => {
-                navigation.openDrawer();
-              }}
-            >
-              <View style={styles.leftDrawerBtn}>
-                <Icon name="menu" size={30} color={COLORS.primary} />
-              </View>
-            </Pressable>
-          ),
           tabBarActiveTintColor: COLORS.primary,
           tabBarIcon: ({ color, size, focused }) => {
             let iconName;
@@ -52,9 +38,6 @@ export default function BottomTabNavigator(props) {
           },
         })}
       >
-        <Tab.Screen name={ROUTES.HOME_TAB} component={Home} />
-        <Tab.Screen name={ROUTES.CREDENTIALS} component={CredentialsHome} />
-        <Tab.Screen name={ROUTES.SCANNER} component={QRScanner} />
         <Tab.Screen
           name={ROUTES.DIDs}
           component={DIDNavigator}
@@ -62,10 +45,13 @@ export default function BottomTabNavigator(props) {
             headerShown: false,
           }}
         />
+        <Tab.Screen name={ROUTES.CREDENTIALS} component={CredentialsHome} />
+        <Tab.Screen name={ROUTES.SCANNER} component={QRScanner} />
+       
         <Tab.Screen
           name={ROUTES.SETTINGS_NAVIGATOR}
           component={SettingsNavigator}
-          options={{ tabBarLabel: "Settings" }}
+          options={{ tabBarLabel: "Settings",headerTitle:'Settings' }}
         />
       </Tab.Navigator>
     </BottomSheetContext.Provider>

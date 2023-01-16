@@ -9,9 +9,7 @@ const Settings = ({navigation}) => {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: COLORS.bgColor,
       }}>
-      <Text>Settings Detail</Text>
       <TouchableOpacity style={styles.button} activeOpacity={0.8}
       onPress={()=>{
         navigation.goBack()

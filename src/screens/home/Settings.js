@@ -8,7 +8,7 @@ const Settings = ({navigation,route}) => {
   const {bottomSheetRef}= useContext(BottomSheetContext)
 
 useEffect(()=>{
-    bottomSheetRef.current.close()
+    bottomSheetRef?.current?.close()
 },[])
   return (
     <SafeAreaView
@@ -16,10 +16,18 @@ useEffect(()=>{
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: COLORS.bgColor,
+       
       }}
     >
-      <Text>Settings</Text>
+      <TouchableOpacity
+        style={styles.button}
+        activeOpacity={0.8}
+        onPress={() => {
+          navigation.navigate(ROUTES.SETTINGS_DETAIL);
+        }}
+      >
+        <Text style={styles.buttonText}>BACKUP</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
@@ -28,7 +36,7 @@ useEffect(()=>{
           navigation.navigate(ROUTES.SETTINGS_DETAIL);
         }}
       >
-        <Text style={styles.buttonText}>Go To Settings Detail</Text>
+        <Text style={styles.buttonText}>RESTORE</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -38,7 +46,7 @@ useEffect(()=>{
           navigation.navigate(ROUTES.LOGIN);
         }}
       >
-        <Text style={styles.buttonText}>Log out</Text>
+        <Text style={styles.buttonText}>LOG OUT</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );

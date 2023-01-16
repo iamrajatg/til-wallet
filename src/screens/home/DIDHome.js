@@ -111,7 +111,7 @@ const DIDHome = ({ navigation }) => {
       <Snackbar
         visible={snackMsg}
         onDismiss={() => dispatch(setSnackMsg(""))}
-        duration={3000}
+        duration={1500}
       >
         {snackMsg}
       </Snackbar>

@@ -6,9 +6,13 @@ const Stack = createNativeStackNavigator();
 
 function SettingsNavigator() {
   return (
-    <Stack.Navigator initialRouteName={ROUTES.SETTINGS}>
-      <Stack.Screen name={ROUTES.SETTINGS} component={Settings} />
-      <Stack.Screen name={ROUTES.SETTINGS_DETAIL} component={SettingsDetail} />
+    <Stack.Navigator initialRouteName={ROUTES.SETTINGS} screenOptions={
+      {
+        headerTitle:'Settings'
+      }
+    }>
+      <Stack.Screen name={ROUTES.SETTINGS} component={Settings} options={{ headerShown: false }}/>
+      <Stack.Screen name={ROUTES.SETTINGS_DETAIL} component={SettingsDetail} options={{ headerShown: false }}/>
     </Stack.Navigator>
   );
 }
