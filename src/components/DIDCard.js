@@ -1,6 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { COLORS } from "../constants";
 
 const DIDCard = ({ name, did, onCopy, onShare,onRemove }) => {

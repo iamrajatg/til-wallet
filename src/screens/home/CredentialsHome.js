@@ -21,6 +21,43 @@ import VCCard from "../../components/VCCard";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CONSTANTS } from "./constants";
 
+export async function getCredentials() {
+  let keys = await AsyncStorage.getAllKeys();
+  let credentials = null;
+  if (Array.isArray(keys)) {
+    keys = keys?.filter((key) =>
+      key.includes(CONSTANTS.LOCAL_STORE_KEYS.CREDENTIAL_PREFIX)
+    );
+    if (keys?.length) {
+      credentials = await AsyncStorage.multiGet(keys);
+      if (credentials) {
+        credentials = credentials.map(([key, value]) => JSON.parse(value));
+      }
+    }
+  }
+  return credentials;
+}
+export async function setCredentials({ credentials, keypairs, dids }) { 
+  let keys = await AsyncStorage.getAllKeys();
+  if (Array.isArray(keys)) {
+    keys = keys?.filter((key) =>
+      key.includes(CONSTANTS.LOCAL_STORE_KEYS.CREDENTIAL_PREFIX)
+    );
+    if (keys?.length) {
+      await AsyncStorage.multiRemove(keys);
+    }
+  }
+  let credentialsToStore = credentials.map((cred) => {
+    return [`${CONSTANTS.LOCAL_STORE_KEYS.CREDENTIAL_PREFIX}${cred.key}`, JSON.stringify(cred)];
+  });
+  if(credentialsToStore?.length)
+  await AsyncStorage.multiSet(credentialsToStore);
+  // console.log('dids',dids)
+  // console.log('keypairs',keypairs)
+  await SecureStore.setItemAsync("keypairs",keypairs);
+  await SecureStore.setItemAsync("dids", dids);
+}
+
 const CredentialsHome = () => {
   const dispatch = useDispatch();
   const credentials = useSelector((state) => state.wallet.credentials);
@@ -29,26 +66,9 @@ const CredentialsHome = () => {
   const isLoading = useSelector((state) => state.common.isLoading);
   const [showMenu, setShowMenu] = useState(false);
   const [currentCardData, setCurrentCardData] = useState({});
-  const { LOCAL_STORE_KEYS } = CONSTANTS;
   const { x, y, index, key, vcJson } = currentCardData;
 
   useEffect(() => {
-    async function getCredentials() {
-      let keys = await AsyncStorage.getAllKeys();
-      let credentials = null;
-      if (Array.isArray(keys)) {
-        keys = keys?.filter((key) =>
-          key.includes(LOCAL_STORE_KEYS.CREDENTIAL_PREFIX)
-        );
-        if (keys?.length) {
-          credentials = await AsyncStorage.multiGet(keys);
-          if (credentials) {
-            credentials = credentials.map(([key, value]) => JSON.parse(value));
-          }
-        }
-      }
-      return credentials;
-    }
     dispatch(setLoader(true));
     getCredentials()
       .then((res) => {

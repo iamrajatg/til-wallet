@@ -23,6 +23,7 @@ export const walletSlice = createSlice({
     addCredential: (state) => {
       state.isLoading = true;
       state.isError = false;
+      state.snackMsg = "Credential Added Successfully!"
     },
     addCredentialSuccess: (state, action) => {
       state.credentials = [...state.credentials, action.payload];

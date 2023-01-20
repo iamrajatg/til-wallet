@@ -15,7 +15,7 @@ import { Snackbar } from "react-native-paper";
 import * as Clipboard from "expo-clipboard";
 
 const DIDHome = ({ navigation }) => {
-  const { bottomSheetRef } = useContext(BottomSheetContext);
+  const { bottomSheetRef,navigationRef } = useContext(BottomSheetContext);
   const snapPoints = useMemo(() => [400], []);
   const dispatch = useDispatch();
   const dids = useSelector((state) => state.wallet.dids);
@@ -25,6 +25,7 @@ const DIDHome = ({ navigation }) => {
   // const [snackMsg, setSnackMsg] = useState("");
 
   useEffect(() => {
+    navigationRef.current = navigation
     async function getValueFor(key) {
       let result = await SecureStore.getItemAsync(key);
       if (result) {
@@ -32,6 +33,7 @@ const DIDHome = ({ navigation }) => {
       }
       return null;
     }
+    // dispatch({type:'CLEAR_STORE'})
     dispatch(setLoader(true));
     getValueFor("dids")
       .then((res) => {
@@ -62,6 +64,8 @@ const DIDHome = ({ navigation }) => {
           bottomSheetRef.current.close();
         }}>
         {dids?.length ? (
+          // <Text>{dids}</Text>
+          // <Text>TEST</Text>
           dids.map((did,i) => (
             <DIDCard
               key={did.did}

@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useState} from "react";
 import {
   StyleSheet,
   Text,
@@ -10,10 +10,52 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { COLORS, ROUTES } from "../../constants";
 import Logo from "../../assets/icons/LOGO.js";
+import {  signInWithEmailAndPassword} from "firebase/auth";
+import { auth } from "../../firebase/firebase";
+import { setError, setLoader } from "../../slices/commonSlice";
+import { setSnackMsg } from "../../slices/walletSlice";
+import { useDispatch, useSelector } from "react-redux";
+import Loader from "../../components/Loader";
+import { Snackbar } from "react-native-paper";
 
 const Login = (props) => {
+
+  const dispatch = useDispatch()
+
   const { navigation } = props;
-;
+  const [value, setValue] = useState({
+    email: '',
+    password: '',
+    error: ''
+  })
+  const snackMsg = useSelector((state) => state.wallet.snackMsg);
+  const isLoading = useSelector((state) => state.common.isLoading);
+
+  async function signIn() {
+    if (value.email === "" || value.password === "") {
+      setValue({
+        ...value,
+        error: "Email and password are mandatory.",
+      });
+      dispatch(setSnackMsg("Email and Password are required"))
+      return;
+    }
+    dispatch(setLoader(true))
+    dispatch(setError(false))
+    try {
+      await signInWithEmailAndPassword(auth, value.email, value.password);
+      dispatch(setLoader(false))
+    } catch (error) {
+      console.error(error)
+      dispatch(setLoader(false))
+      dispatch(setError(true))
+      dispatch(setSnackMsg('Error When Logging in,Please try again.'))
+      setValue({
+        ...value,
+        error: error.message || "Some Error Occured",
+      });
+    }
+  }
   return (
     <SafeAreaView style={styles.main}>
       <View style={styles.container}>
@@ -24,8 +66,20 @@ const Login = (props) => {
           </View>
 
           <Text style={styles.loginContinueTxt}>Login to continue</Text>
-          <TextInput style={styles.input} placeholder="Email" />
-          <TextInput style={styles.input} placeholder="Password" />
+          <TextInput
+            style={styles.input}
+            value={value.email}
+            onChangeText={(text) => setValue({ ...value, email: text })}
+            placeholder="Email"
+          />
+          <TextInput
+            style={styles.input}
+            value={value.password}
+            secureTextEntry
+            onChangeText={(text) => setValue({ ...value, password: text })}
+            placeholder="Password"
+            textContentType="password"
+          />
 
           <View style={styles.loginBtnWrapper}>
             <LinearGradient
@@ -34,11 +88,8 @@ const Login = (props) => {
               start={{ y: 0.0, x: 0.0 }}
               end={{ y: 1.0, x: 0.0 }}
             >
-              {/***************** LOGIN BUTTON *****************/}
               <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate(ROUTES.HOME)
-                }}
+                onPress={signIn}
                 activeOpacity={0.7}
                 style={styles.loginBtn}
               >
@@ -46,23 +97,10 @@ const Login = (props) => {
               </TouchableOpacity>
             </LinearGradient>
           </View>
-
-          {/***************** FORGOT PASSWORD BUTTON *****************/}
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate(ROUTES.FORGOT_PASSWORD, {
-                userid: "TEST ID",
-              })
-            }
-            style={styles.forgotPassBtn}
-          >
-            <Text style={styles.forgotPassText}>Forgot Password?</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}> Don't have an account? </Text>
-          {/******************** REGISTER BUTTON *********************/}
+          <Text style={styles.footerText}>Don't have an account? </Text>
           <TouchableOpacity
             onPress={() => navigation.navigate(ROUTES.REGISTER)}
           >
@@ -70,6 +108,14 @@ const Login = (props) => {
           </TouchableOpacity>
         </View>
       </View>
+      <Loader isLoading={isLoading} />
+      <Snackbar
+        visible={snackMsg}
+        onDismiss={() => dispatch(setSnackMsg(""))}
+        duration={1500}
+      >
+        {snackMsg}
+      </Snackbar>
     </SafeAreaView>
   );
 };

@@ -22,11 +22,31 @@ import { ROUTES } from "../constants";
 import * as ed from "../utils/eddsa";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CONSTANTS } from "../screens/home/constants";
+
 export const clearStore = async () => {
   await SecureStore.deleteItemAsync("keypairs");
   await SecureStore.deleteItemAsync("dids");
   await SecureStore.deleteItemAsync("credentials");
+  let keys = await AsyncStorage.getAllKeys();
+  if (Array.isArray(keys)) {
+    keys = keys?.filter((key) =>
+      key.includes(CONSTANTS.LOCAL_STORE_KEYS.CREDENTIAL_PREFIX)
+    );
+    if (keys?.length) {
+      await AsyncStorage.multiRemove(keys);
+    }
+  }
 };
+
+function* clearStoreSaga(){
+  try {
+    yield call(clearStore)
+  }
+  catch (error) {
+    console.error(error)
+  }
+}
+ 
 
 const { LOCAL_STORE_KEYS } = CONSTANTS;
 
@@ -180,6 +200,7 @@ function* walletSaga() {
   yield takeLatest(addCredential, addCredentialSaga);
   yield takeLatest(removeDid, removeDidSaga);
   yield takeLatest(removeCredential, removeCredentialSaga);
+  yield takeLatest('CLEAR_STORE',clearStoreSaga)
 }
 
 export default walletSaga;

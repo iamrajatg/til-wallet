@@ -1,4 +1,4 @@
-import React, { createContext, useRef } from "react";
+import React, { createContext, useEffect, useRef } from "react";
 import { COLORS, ROUTES } from "../constants";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
@@ -7,15 +7,52 @@ import { StyleSheet } from "react-native";
 import DIDNavigator from "./DIDNavigator";
 import QRScanner from "../screens/home/Scanner";
 import CredentialsHome from "../screens/home/CredentialsHome";
+import * as Linking from 'expo-linking';
+import { useDispatch } from "react-redux";
+import { addCredential } from "../slices/walletSlice";
+import { Base64 } from "../utils/utils";
 
 const Tab = createBottomTabNavigator();
 export const BottomSheetContext = createContext();
 export default function BottomTabNavigator(props) {
+  const dispatch = useDispatch()
   const bottomSheetRef = useRef(null);
+  const navigationRef = useRef(null)
 
-  const { navigation } = props;
+
+  const url = Linking.useURL();
+
+  const handleURL = (url) => {
+    const { path, queryParams } = Linking.parse(url);
+    if (path === 'addvc') {
+      if(queryParams.vc && navigationRef.current?.navigate){
+       
+        try {
+          const str = Base64.atob(queryParams.vc)
+          if(str){
+          dispatch(addCredential(JSON.parse(str)));
+          navigationRef.current.navigate(ROUTES.CREDENTIALS)
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      }
+    } else {
+        console.log(path, queryParams);
+    }
+}
+
+  useEffect(() => {
+    // Do something with URL
+    if (url) {
+        handleURL(url);
+    } else {
+        console.log('No URL');
+    }
+}, [url])
+
   return (
-    <BottomSheetContext.Provider value={{ bottomSheetRef }}>
+    <BottomSheetContext.Provider value={{ bottomSheetRef,navigationRef }}>
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerTitleAlign: "left",
