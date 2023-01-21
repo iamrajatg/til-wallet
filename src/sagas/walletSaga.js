@@ -1,5 +1,5 @@
 import axios from "axios";
-import { call, put, takeLatest } from "redux-saga/effects";
+import { call, put, takeLatest,select } from "redux-saga/effects";
 import { setError, setLoader } from "../slices/commonSlice";
 import * as SecureStore from "expo-secure-store";
 import { API_URL_GENERATE_DID } from "../constants/config";
@@ -110,10 +110,16 @@ function* generateDidSaga(action) {
 function* addCredentialSaga(action) {
   try {
     let credentialData = action.payload;
+    const vcJson = JSON.stringify(credentialData)
     const credential = {
       ...credentialData,
-      vcJson: JSON.stringify(credentialData),
+      vcJson
     };
+
+    const storedCredentials = yield select(state=>state.wallet.credentials)
+    if(storedCredentials.some(cred=>cred.vcJson===vcJson)){
+       return yield put(addCredentialFail('ALREADY_STORED'));
+    }
     if (Array.isArray(credentialData.type)) {
       if (credentialData.type.length > 1) {
         credential.type = credentialData.type[1];

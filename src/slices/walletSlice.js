@@ -31,6 +31,8 @@ export const walletSlice = createSlice({
       state.isError = false;
     },
     addCredentialFail: (state, action) => {
+      if(action.payload==="ALREADY_STORED")
+      state.snackMsg="Credential Already Added."
       state.isLoading = false;
       state.isError = true;
     },

@@ -23,10 +23,10 @@ export default function BottomTabNavigator(props) {
   const url = Linking.useURL();
 
   const handleURL = (url) => {
-    const { path, queryParams } = Linking.parse(url);
-    if (path === 'addvc') {
+    const urlRcvd = Linking.parse(url);
+    const {path,queryParams} =  urlRcvd
+    console.log('url received -',urlRcvd)
       if(queryParams.vc && navigationRef.current?.navigate){
-       
         try {
           const str = Base64.atob(queryParams.vc)
           if(str){
@@ -37,9 +37,6 @@ export default function BottomTabNavigator(props) {
           console.error(error)
         }
       }
-    } else {
-        console.log(path, queryParams);
-    }
 }
 
   useEffect(() => {
