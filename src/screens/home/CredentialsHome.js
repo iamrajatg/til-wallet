@@ -131,6 +131,8 @@ const CredentialsHome = () => {
                   index={i}
                   type={vc.type}
                   issuer={vc.issuer}
+                  expirationDate={vc.expirationDate}
+                  issuanceDate={vc.issuanceDate}
                   setCurrentCardData={setCurrentCardData}
                   setShowMenu={setShowMenu}
                   vcJson={vc.vcJson}

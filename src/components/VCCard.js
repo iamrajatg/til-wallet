@@ -2,13 +2,13 @@ import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useRef } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { COLORS } from "../constants";
+import { Base64 } from "../utils/utils";
 
 const VCCard = ({
   type = "Verifiable Credential",
-  expiryDate = "01/22",
-  issuanceDate = "01/23",
-  issuer = "TIL",
-  url = "https://www.twitter.com",
+  expirationDate,
+  issuanceDate,
+  issuer,
   setCurrentCardData,
   setShowMenu,
   index,
@@ -18,17 +18,26 @@ const VCCard = ({
   const menuBtnRef = useRef();
   return (
     <Pressable
-      onPress={() => {
-        Linking.openURL(url).catch((err) => {
+      onPress={() => { 
+        try {
+        const vcData = JSON.parse(vcJson)
+        let url = vcData?.credentialSubject?.url
+        if(!url)
+        return
+          let newUrl = `${url}?vc=${Base64.btoa(vcJson)}`
+          Linking.openURL(newUrl).catch((err) => {
           console.error("Failed to open url: ", err);
         });
+        } catch (error) {
+          console.error(error)
+        }
       }}
       style={styles.vcCard}
     >
       <Text style={styles.vcType}>{type}</Text>
-      <Text style={styles.issuer}>{issuer}</Text>
-      <Text style={styles.issuanceDate}>{issuanceDate}</Text>
-      <Text style={styles.expiryDate}>{expiryDate}</Text>
+      {issuer && <Text style={styles.issuer}>Issued By : {issuer.replace('dids').includes('ipuresults.co.in:til')?"TIL":issuer}</Text>}
+      {issuanceDate && <Text style={styles.issuanceDate}>Issued On : {issuanceDate}</Text>}
+      {expirationDate && <Text style={styles.expiryDate}>Expiring On : {expirationDate}</Text>}
       <Pressable
         ref={menuBtnRef}
         onPress={(e) => {
