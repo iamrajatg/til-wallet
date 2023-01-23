@@ -59,7 +59,8 @@ const Settings = ({ navigation, route }) => {
             credentials: credentials ? JSON.stringify(credentials) : null,
           };
           try {
-            if(!JSON.parse(dids)?.length && !JSON.parse(credentials)?.length){
+            const creds = typeof credentials ==="string"? JSON.parse(credentials):credentials
+            if(!JSON.parse(dids)?.length && !creds?.length){
               dispatch(setLoader(false));
               return  dispatch(setSnackMsg("Nothing to backup!"));
             }

@@ -13,6 +13,7 @@ import DIDCard from "../../components/DIDCard";
 import QRModal from "../../components/QRModal";
 import { Snackbar } from "react-native-paper";
 import * as Clipboard from "expo-clipboard";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const DIDHome = ({ navigation }) => {
   const { bottomSheetRef,navigationRef } = useContext(BottomSheetContext);
@@ -55,6 +56,7 @@ const DIDHome = ({ navigation }) => {
   }, []);
 
   return (
+    <GestureHandlerRootView style={{flex:1}}>
     <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollview}>
         <Pressable
@@ -64,8 +66,6 @@ const DIDHome = ({ navigation }) => {
           bottomSheetRef.current.close();
         }}>
         {dids?.length ? (
-          // <Text>{dids}</Text>
-          // <Text>TEST</Text>
           dids.map((did,i) => (
             <DIDCard
               key={did.did}
@@ -120,6 +120,7 @@ const DIDHome = ({ navigation }) => {
         {snackMsg}
       </Snackbar>
     </SafeAreaView>
+    </GestureHandlerRootView>
   );
 };
 

@@ -117,7 +117,7 @@ function* addCredentialSaga(action) {
     };
 
     const storedCredentials = yield select(state=>state.wallet.credentials)
-    if(storedCredentials.some(cred=>cred.vcJson===vcJson)){
+    if(storedCredentials?.some(cred=>cred.vcJson===vcJson)){
        return yield put(addCredentialFail('ALREADY_STORED'));
     }
     if (Array.isArray(credentialData.type)) {
