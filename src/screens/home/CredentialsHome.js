@@ -9,6 +9,8 @@ import React, { useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  clearPresentation,
+  generatePresentation,
   loadCredentials,
   removeCredential,
   setSnackMsg,
@@ -61,12 +63,14 @@ export async function setCredentials({ credentials, keypairs, dids }) {
 const CredentialsHome = () => {
   const dispatch = useDispatch();
   const credentials = useSelector((state) => state.wallet.credentials);
+  const presentation = useSelector(state=>state.wallet.presentation)
+  // const presentationMode =  useSelector(state=>state.wallet.presentationMode)
   const snackMsg = useSelector((state) => state.wallet.snackMsg);
   const [QRCredential, setQRCredential] = useState("");
   const isLoading = useSelector((state) => state.common.isLoading);
   const [showMenu, setShowMenu] = useState(false);
   const [currentCardData, setCurrentCardData] = useState({});
-  const { x, y, index, key, vcJson } = currentCardData;
+  const { x, y, index, key, vcJson,holderDid,isTILVC} = currentCardData;
 
   useEffect(() => {
     dispatch(setLoader(true));
@@ -88,6 +92,10 @@ const CredentialsHome = () => {
         dispatch(setLoader(false));
         dispatch(setError(true));
       });
+
+      return ()=>{
+        dispatch(clearPresentation())
+      }
   }, []);
 
   return (
@@ -110,9 +118,19 @@ const CredentialsHome = () => {
             >
               <Menu.Item
                 onPress={() => {
+                  // if (isTILVC) {
+                  //   dispatch(
+                  //     generatePresentation({
+                  //       credential: vcJson,
+                  //       holderDid,
+                  //       mode: "qr",
+                  //     })
+                  //   );
+                  // } else 
                   setQRCredential(vcJson);
                   setShowMenu(false);
-                }}
+                }
+              }
                 title="Share"
               />
               <Menu.Item
@@ -136,6 +154,8 @@ const CredentialsHome = () => {
                   setCurrentCardData={setCurrentCardData}
                   setShowMenu={setShowMenu}
                   vcJson={vc.vcJson}
+                  presentation={presentation}
+                  // presentationMode={presentationMode}
                 />
               ))
             ) : (
@@ -146,7 +166,13 @@ const CredentialsHome = () => {
           </Pressable>
         </ScrollView>
         <Loader isLoading={isLoading} />
-        <QRModal value={QRCredential} onClose={() => setQRCredential("")} />
+        <QRModal
+          value={QRCredential}
+          onClose={() => {
+            setQRCredential("");
+            dispatch(clearPresentation());
+          }}
+        />
         <Snackbar
           visible={snackMsg}
           onDismiss={() => dispatch(setSnackMsg(""))}

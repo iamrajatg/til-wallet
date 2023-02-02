@@ -8,11 +8,20 @@ export const walletSlice = createSlice({
     isLoading: false,
     isError: false,
     snackMsg: "",
+    presentation:"",
+    presentationMode:"",
+    sendDataConfirmation:false,
   },
   reducers: {
     generateDid: (state) => {
       state.isLoading = true;
       state.isError = false;
+    },
+    generatePresentation:(state,action)=>{
+      state.isLoading = true;
+      state.isError = false;
+      state.presentation = ""
+      state.presentationMode = action.payload.mode
     },
     loadCredentials: (state, action) => {
       state.credentials = action.payload;
@@ -44,6 +53,22 @@ export const walletSlice = createSlice({
     generateDidFail: (state, action) => {
       state.isLoading = false;
       state.isError = true;
+      state.snackMsg = "Error Creating DID"
+    },
+    generatePresentationSuccess: (state, action) => {
+      state.presentation = action.payload;
+      state.isLoading = false;
+      state.isError = false;
+    },
+    generatePresentationFail: (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.snackMsg =  "Error Generating Presentation"
+      state.presentationMode = ""
+    },
+    clearPresentation : (state)=>{
+      state.presentation = ""
+      state.presentationMode = ""
     },
     removeDid: (state) => {
       state.isLoading = true;
@@ -77,6 +102,22 @@ export const walletSlice = createSlice({
     setSnackMsg: (state, action) => {
       state.snackMsg = action.payload;
     },
+    loadSendDataConfirmation:(state)=>{
+      state.isLoading = true
+      state.isError = false
+    },
+    setLoadDataConfirmation : (state,action)=>{
+      state.sendDataConfirmation = action.payload
+      state.isLoading = false
+      state.isError = false
+    },
+    saveLoadDataConfirmation : (state,action)=>{
+      state.isLoading = true
+      state.isError = false
+    },
+    setFirstLoad : (state,action)=>{
+      state.firstLoad = action.payload
+    }
   },
 });
 
@@ -85,6 +126,10 @@ export const {
   generateDid,
   generateDidSuccess,
   generateDidFail,
+  generatePresentation,
+  generatePresentationSuccess,
+  generatePresentationFail,
+  clearPresentation,
   loadCredentials,
   addCredential,
   removeDid,
@@ -95,6 +140,10 @@ export const {
   removeCredentialFail,
   removeCredential,
   addCredentialSuccess,
-  addCredentialFail
+  addCredentialFail,
+  loadSendDataConfirmation,
+  setLoadDataConfirmation,
+  saveLoadDataConfirmation,
+  setFirstLoad
 } = walletSlice.actions;
 export default walletSlice.reducer;

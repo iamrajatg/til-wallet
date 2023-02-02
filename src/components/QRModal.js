@@ -18,18 +18,18 @@ const QRModal = ({ value,onClose }) => {
           }}
         >
             <View style={{
-                width:350,
-                height:350,
+                width:"100%",
+                height:500,
                 backgroundColor:COLORS.white,
                 borderRadius:20,
                 justifyContent:'center',
                 alignItems:'center'
             }}>
           <QRCode
-            size={300}
+            size={350}
             style={{ height: "auto", maxWidth: "100%", width: "100%" }}
             value={value}
-            viewBox={`0 0 300 300`}
+            viewBox={`0 0 350 350`}
           />
           </View>
         </View>
